@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: interview-api
+    env: node
+    buildCommand: npm install --production=false
+    startCommand: node server.js
