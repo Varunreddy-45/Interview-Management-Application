@@ -23,7 +23,7 @@ function InterviewForm() {
     try {
       // Save data to MySQL through backend API
       await axios.post(
-        "http://localhost:5000/api/interviews",
+        "https://interview-management-application.onrender.com/api/interviews",
         formData
       );
 
