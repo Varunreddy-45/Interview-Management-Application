@@ -1,10 +1,10 @@
 const express = require("express");
 const cors = require("cors");
-const pool = require("./db"); // 👈 PostgreSQL pool now
+const pool = require("./db");
 
 const app = express();
 
-// ✅ CORS (Vercel + local safe)
+// ✅ CORS
 app.use(cors({
   origin: "*",
   methods: ["GET", "POST", "PUT", "DELETE"],
@@ -13,13 +13,13 @@ app.use(cors({
 
 app.use(express.json());
 
-// ✅ REQUEST LOGGER
+// ✅ Logger
 app.use((req, res, next) => {
   console.log(`${req.method} ${req.url}`);
   next();
 });
 
-// ✅ TIMEOUT FIX (prevents hanging → 502)
+// ✅ Timeout fix
 app.use((req, res, next) => {
   req.setTimeout(15000);
   res.setTimeout(15000);
@@ -29,6 +29,16 @@ app.use((req, res, next) => {
 /* ---------------- HEALTH CHECK ---------------- */
 app.get("/", (req, res) => {
   res.send("Interview Management API is running 🚀");
+});
+
+/* ---------------- TEST DB ---------------- */
+app.get("/test-db", async (req, res) => {
+  try {
+    const result = await pool.query("SELECT NOW()");
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 /* ---------------- POST: Schedule Interview ---------------- */
@@ -41,11 +51,12 @@ app.post("/api/interviews", async (req, res) => {
       [candidateName, email, role, interviewDate]
     );
 
-    res.json({ message: "Success" });
+    res.json({ message: "Interview Scheduled Successfully" });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
+
 /* ---------------- GET: Fetch Interviews ---------------- */
 app.get("/api/interviews", async (req, res) => {
   try {
@@ -56,9 +67,9 @@ app.get("/api/interviews", async (req, res) => {
   }
 });
 
-/* ---------------- GLOBAL ERROR HANDLER ---------------- */
+/* ---------------- ERROR HANDLER ---------------- */
 app.use((err, req, res, next) => {
-  console.error("Server Error:", err);
+  console.error(err);
   res.status(500).json({ error: "Internal Server Error" });
 });
 
