@@ -1,10 +1,10 @@
 const express = require("express");
 const cors = require("cors");
-const db = require("./db");
+const pool = require("./db"); // 👈 PostgreSQL pool now
 
 const app = express();
 
-// ✅ FIXED CORS for frontend (Vercel + local support)
+// ✅ CORS (Vercel + local safe)
 app.use(cors({
   origin: "*",
   methods: ["GET", "POST", "PUT", "DELETE"],
@@ -13,35 +13,17 @@ app.use(cors({
 
 app.use(express.json());
 
-/* ---------------- POST: Schedule Interview ---------------- */
-app.post("/api/interviews", (req, res) => {
-  const { candidateName, email, role, interviewDate } = req.body;
-
-  if (!candidateName || !email || !role || !interviewDate) {
-    return res.status(400).json({ message: "Missing fields" });
-  }
-
-  const sql =
-    "INSERT INTO interviews(candidateName, email, role, interviewDate) VALUES (?, ?, ?, ?)";
-
-  db.query(sql, [candidateName, email, role, interviewDate], (err, result) => {
-    if (err) {
-      console.error("DB Insert Error:", err);
-      return res.status(500).json({ error: err });
-    }
-    res.json({ message: "Interview Scheduled Successfully" });
-  });
+// ✅ REQUEST LOGGER
+app.use((req, res, next) => {
+  console.log(`${req.method} ${req.url}`);
+  next();
 });
 
-/* ---------------- GET: Fetch Interviews ---------------- */
-app.get("/api/interviews", (req, res) => {
-  db.query("SELECT * FROM interviews", (err, result) => {
-    if (err) {
-      console.error("DB Fetch Error:", err);
-      return res.status(500).json({ error: err });
-    }
-    res.json(result);
-  });
+// ✅ TIMEOUT FIX (prevents hanging → 502)
+app.use((req, res, next) => {
+  req.setTimeout(15000);
+  res.setTimeout(15000);
+  next();
 });
 
 /* ---------------- HEALTH CHECK ---------------- */
@@ -49,7 +31,38 @@ app.get("/", (req, res) => {
   res.send("Interview Management API is running 🚀");
 });
 
-/* ---------------- FIX FOR RENDER PORT ---------------- */
+/* ---------------- POST: Schedule Interview ---------------- */
+app.post("/api/interviews", async (req, res) => {
+  const { candidateName, email, role, interviewDate } = req.body;
+
+  try {
+    await pool.query(
+      "INSERT INTO interviews(candidateName, email, role, interviewDate) VALUES ($1,$2,$3,$4)",
+      [candidateName, email, role, interviewDate]
+    );
+
+    res.json({ message: "Success" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+/* ---------------- GET: Fetch Interviews ---------------- */
+app.get("/api/interviews", async (req, res) => {
+  try {
+    const result = await pool.query("SELECT * FROM interviews");
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+/* ---------------- GLOBAL ERROR HANDLER ---------------- */
+app.use((err, req, res, next) => {
+  console.error("Server Error:", err);
+  res.status(500).json({ error: "Internal Server Error" });
+});
+
+/* ---------------- START SERVER ---------------- */
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
