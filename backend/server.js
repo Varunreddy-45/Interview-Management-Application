@@ -60,8 +60,43 @@ app.post("/api/interviews", async (req, res) => {
 /* ---------------- GET: Fetch Interviews ---------------- */
 app.get("/api/interviews", async (req, res) => {
   try {
-    const result = await pool.query("SELECT * FROM interviews");
+    const result = await pool.query(
+      "SELECT * FROM interviews ORDER BY id DESC"
+    );
     res.json(result.rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+/* ---------------- PUT: Update Interview Status ---------------- */
+app.put("/api/interviews/:id/status", async (req, res) => {
+  const { id } = req.params;
+  const { status } = req.body;
+
+  try {
+    await pool.query(
+      "UPDATE interviews SET status = $1 WHERE id = $2",
+      [status, id]
+    );
+
+    res.json({ message: "Status Updated Successfully" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+/* ---------------- DELETE: Delete Interview ---------------- */
+app.delete("/api/interviews/:id", async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    await pool.query(
+      "DELETE FROM interviews WHERE id = $1",
+      [id]
+    );
+
+    res.json({ message: "Interview Deleted Successfully" });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
