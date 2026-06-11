@@ -48,6 +48,7 @@ function InterviewForm() {
           candidate_name: formData.candidateName,
           role: formData.role,
           interview_date: formData.interviewDate,
+          status: "Scheduled",
           email: formData.email
         },
         "ZumjmtnJzIR1-ugVq"
@@ -69,13 +70,29 @@ function InterviewForm() {
     }
   };
 
-  const updateStatus = async (id, status) => {
+  const updateStatus = async (id, status, candidate) => {
     try {
       await axios.put(`${API_URL}/${id}/status`, {
         status
       });
 
+      if (status === "Selected" || status === "Rejected") {
+        await emailjs.send(
+          "service_iccw53r",
+          "template_n36zluo",
+          {
+            candidate_name: candidate.candidatename,
+            role: candidate.role,
+            status: status,
+            email: candidate.email
+          },
+          "ZumjmtnJzIR1-ugVq"
+        );
+      }
+
       fetchInterviews();
+
+      alert(`Candidate ${status}`);
     } catch (error) {
       console.error(error);
       alert("Error updating status");
@@ -93,7 +110,10 @@ function InterviewForm() {
   };
 
   return (
-    <div>
+  <div className="container">
+    <h1 className="title">Interview Management System</h1>
+
+    <div className="form-card">
       <form onSubmit={handleSubmit}>
         <input
           type="text"
@@ -107,7 +127,7 @@ function InterviewForm() {
         <input
           type="email"
           name="email"
-          placeholder="Email"
+          placeholder="Candidate Email"
           value={formData.email}
           onChange={handleChange}
           required
@@ -130,16 +150,16 @@ function InterviewForm() {
           required
         />
 
-        <button type="submit">
+        <button type="submit" className="submit-btn">
           Schedule Interview
         </button>
       </form>
+    </div>
 
-      <br />
-
+    <div className="table-card">
       <h2>Interview List</h2>
 
-      <table border="1" cellPadding="10">
+      <table>
         <thead>
           <tr>
             <th>Name</th>
@@ -162,33 +182,35 @@ function InterviewForm() {
 
               <td>
                 <button
+                  className="action-btn complete"
                   onClick={() =>
-                    updateStatus(item.id, "Completed")
+                    updateStatus(item.id, "Completed", item)
                   }
                 >
                   Complete
                 </button>
 
                 <button
+                  className="action-btn select"
                   onClick={() =>
-                    updateStatus(item.id, "Selected")
+                    updateStatus(item.id, "Selected", item)
                   }
                 >
                   Select
                 </button>
 
                 <button
+                  className="action-btn reject"
                   onClick={() =>
-                    updateStatus(item.id, "Rejected")
+                    updateStatus(item.id, "Rejected", item)
                   }
                 >
                   Reject
                 </button>
 
                 <button
-                  onClick={() =>
-                    deleteInterview(item.id)
-                  }
+                  className="action-btn delete"
+                  onClick={() => deleteInterview(item.id)}
                 >
                   Delete
                 </button>
@@ -198,7 +220,7 @@ function InterviewForm() {
         </tbody>
       </table>
     </div>
-  );
+  </div>
+);
 }
-
 export default InterviewForm;
