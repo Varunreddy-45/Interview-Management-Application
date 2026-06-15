@@ -11,9 +11,19 @@ function InterviewForm() {
   });
 
   const [interviews, setInterviews] = useState([]);
+  const [prediction, setPrediction] = useState(null);
+  const [fitForm, setFitForm] = useState({
+    experience: "0.8",
+    communication: "0.7",
+    technical: "0.6"
+  });
 
   const API_URL =
-    "https://interview-management-application.onrender.com/api/interviews";
+    process.env.REACT_APP_API_URL || "http://localhost:5000/api/interviews";
+  const MODEL_URL =
+    process.env.REACT_APP_API_URL
+      ? process.env.REACT_APP_API_URL.replace(/\/api\/interviews$/, "") + "/api/predict-fit"
+      : "http://localhost:5000/api/predict-fit";
 
   useEffect(() => {
     fetchInterviews();
@@ -33,6 +43,25 @@ function InterviewForm() {
       ...formData,
       [e.target.name]: e.target.value
     });
+  };
+
+  const handleFitChange = (e) => {
+    setFitForm({
+      ...fitForm,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  const predictFitScore = async (e) => {
+    e.preventDefault();
+
+    try {
+      const res = await axios.post(MODEL_URL, fitForm);
+      setPrediction(res.data);
+    } catch (error) {
+      console.error(error);
+      alert("Unable to predict candidate fit");
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -154,6 +183,56 @@ function InterviewForm() {
           Schedule Interview
         </button>
       </form>
+    </div>
+
+    <div className="form-card">
+      <h2>AI Candidate Fit Predictor</h2>
+      <p style={{ marginTop: "-8px", color: "#4b5563" }}>
+        Use the model to estimate how suitable a candidate might be for the role.
+      </p>
+      <form onSubmit={predictFitScore}>
+        <input
+          type="number"
+          name="experience"
+          min="0"
+          max="1"
+          step="0.1"
+          value={fitForm.experience}
+          onChange={handleFitChange}
+          placeholder="Experience (0 to 1)"
+          required
+        />
+        <input
+          type="number"
+          name="communication"
+          min="0"
+          max="1"
+          step="0.1"
+          value={fitForm.communication}
+          onChange={handleFitChange}
+          placeholder="Communication (0 to 1)"
+          required
+        />
+        <input
+          type="number"
+          name="technical"
+          min="0"
+          max="1"
+          step="0.1"
+          value={fitForm.technical}
+          onChange={handleFitChange}
+          placeholder="Technical Skills (0 to 1)"
+          required
+        />
+        <button type="submit" className="submit-btn">Predict Fit</button>
+      </form>
+
+      {prediction && (
+        <div style={{ marginTop: "12px", padding: "10px", borderRadius: "8px", background: "#eff6ff" }}>
+          <strong>Predicted Fit Score:</strong> {prediction.score}%<br />
+          <strong>Label:</strong> {prediction.label}
+        </div>
+      )}
     </div>
 
     <div className="table-card">

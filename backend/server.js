@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const pool = require("./db");
+const { predictFit } = require("./mlModel");
 
 const app = express();
 
@@ -29,6 +30,15 @@ app.use((req, res, next) => {
 /* ---------------- HEALTH CHECK ---------------- */
 app.get("/", (req, res) => {
   res.send("Interview Management API is running 🚀");
+});
+
+app.post("/api/predict-fit", (req, res) => {
+  try {
+    const result = predictFit(req.body);
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 });
 
 /* ---------------- TEST DB ---------------- */
