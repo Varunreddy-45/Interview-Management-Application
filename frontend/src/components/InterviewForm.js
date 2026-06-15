@@ -78,8 +78,8 @@ function InterviewForm() {
 
       if (status === "Selected" || status === "Rejected") {
         await emailjs.send(
-          "service_iccw53r",
-          "template_n36zluo",
+           "service_gbuyvhq",
+    "template_cwehn62",
           {
             candidate_name: candidate.candidatename,
             role: candidate.role,
