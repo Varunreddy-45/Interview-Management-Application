@@ -76,8 +76,9 @@ const STATUS_EMAILJS_TEMPLATE_ID = "template_cwehn62";
       await axios.post(API_URL, formData);
 
      await emailjs.send(
-  EMAILJS_SERVICE_ID,
-  EMAILJS_TEMPLATE_ID,
+  "service_iccw53r",
+  "template_n36zluo",
+  
         {
           candidate_name: formData.candidateName,
           name: formData.candidateName,
@@ -90,7 +91,7 @@ const STATUS_EMAILJS_TEMPLATE_ID = "template_cwehn62";
           status: "Scheduled",
           message: `Interview scheduled for ${formData.role}`
         },
-       EMAILJS_PUBLIC_KEY
+     "ZumjmtnJzIR1-ugVq"
       );
 
       alert("Interview Scheduled Successfully");
@@ -117,8 +118,9 @@ const STATUS_EMAILJS_TEMPLATE_ID = "template_cwehn62";
 
       if (["Selected", "Rejected", "Completed"].includes(status)) {
         await emailjs.send(
-  STATUS_EMAILJS_SERVICE_ID,
-  STATUS_EMAILJS_TEMPLATE_ID,
+           "service_gbuyvhq",
+         "template_cwehn62",
+  
           {
             candidate_name: candidate.candidateName,
             name: candidate.candidateName,
@@ -131,7 +133,7 @@ const STATUS_EMAILJS_TEMPLATE_ID = "template_cwehn62";
             date: candidate.interviewDate,
             message: `Your interview status has been updated to ${status}`
           },
-         EMAILJS_PUBLIC_KEY
+      "ZumjmtnJzIR1-ugVq"
         );
       }
 
