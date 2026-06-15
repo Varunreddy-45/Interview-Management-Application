@@ -1,3 +1,4 @@
+require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const pool = require("./db");
@@ -70,9 +71,17 @@ app.post("/api/interviews", async (req, res) => {
 /* ---------------- GET: Fetch Interviews ---------------- */
 app.get("/api/interviews", async (req, res) => {
   try {
-    const result = await pool.query(
-      "SELECT * FROM interviews ORDER BY id DESC"
-    );
+    const result = await pool.query(`
+      SELECT
+        id,
+        candidatename AS "candidateName",
+        email,
+        role,
+        interviewdate AS "interviewDate",
+        status
+      FROM interviews
+      ORDER BY id DESC
+    `);
     res.json(result.rows);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -121,6 +130,26 @@ app.use((err, req, res, next) => {
 /* ---------------- START SERVER ---------------- */
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+async function initDatabase() {
+  try {
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS interviews (
+        id SERIAL PRIMARY KEY,
+        candidateName VARCHAR(255),
+        email VARCHAR(255),
+        role VARCHAR(255),
+        interviewDate VARCHAR(255),
+        status VARCHAR(50) DEFAULT 'Scheduled'
+      )
+    `);
+    console.log("Database ready");
+  } catch (err) {
+    console.error("Database init failed:", err.message);
+  }
+}
+
+initDatabase().then(() => {
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
 });

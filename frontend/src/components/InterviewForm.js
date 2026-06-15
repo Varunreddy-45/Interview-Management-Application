@@ -19,13 +19,18 @@ function InterviewForm() {
   });
 
   const API_URL =
-    process.env.REACT_APP_API_URL || "http://localhost:5000/api/interviews";
-  const MODEL_URL =
-    process.env.REACT_APP_API_URL
-      ? process.env.REACT_APP_API_URL.replace(/\/api\/interviews$/, "") + "/api/predict-fit"
-      : "http://localhost:5000/api/predict-fit";
+    "https://interview-management-application.onrender.com/api/interviews";
+  const MODEL_URL =  "https://interview-management-application.onrender.com/api/predict-fit";
+ const EMAILJS_PUBLIC_KEY = "ZumjmtnJzIR1-ugVq";
+
+const EMAILJS_SERVICE_ID = "service_iccw53r";
+const EMAILJS_TEMPLATE_ID = "template_n36zluo";
+
+const STATUS_EMAILJS_SERVICE_ID = "service_gbuyvhq";
+const STATUS_EMAILJS_TEMPLATE_ID = "template_cwehn62";
 
   useEffect(() => {
+    emailjs.init(EMAILJS_PUBLIC_KEY);
     fetchInterviews();
   }, []);
 
@@ -70,17 +75,22 @@ function InterviewForm() {
     try {
       await axios.post(API_URL, formData);
 
-      await emailjs.send(
-        "service_iccw53r",
-        "template_n36zluo",
+     await emailjs.send(
+  EMAILJS_SERVICE_ID,
+  EMAILJS_TEMPLATE_ID,
         {
           candidate_name: formData.candidateName,
+          name: formData.candidateName,
+          to_email: formData.email,
+          email: formData.email,
+          candidateEmail: formData.email,
           role: formData.role,
           interview_date: formData.interviewDate,
+          date: formData.interviewDate,
           status: "Scheduled",
-          email: formData.email
+          message: `Interview scheduled for ${formData.role}`
         },
-        "ZumjmtnJzIR1-ugVq"
+       EMAILJS_PUBLIC_KEY
       );
 
       alert("Interview Scheduled Successfully");
@@ -105,17 +115,23 @@ function InterviewForm() {
         status
       });
 
-      if (status === "Selected" || status === "Rejected") {
+      if (["Selected", "Rejected", "Completed"].includes(status)) {
         await emailjs.send(
-           "service_gbuyvhq",
-    "template_cwehn62",
+  STATUS_EMAILJS_SERVICE_ID,
+  STATUS_EMAILJS_TEMPLATE_ID,
           {
-            candidate_name: candidate.candidatename,
+            candidate_name: candidate.candidateName,
+            name: candidate.candidateName,
+            to_email: candidate.email,
+            email: candidate.email,
+            candidateEmail: candidate.email,
             role: candidate.role,
-            status: status,
-            email: candidate.email
+            status,
+            interview_date: candidate.interviewDate,
+            date: candidate.interviewDate,
+            message: `Your interview status has been updated to ${status}`
           },
-          "ZumjmtnJzIR1-ugVq"
+         EMAILJS_PUBLIC_KEY
         );
       }
 
@@ -191,6 +207,9 @@ function InterviewForm() {
         Use the model to estimate how suitable a candidate might be for the role.
       </p>
       <form onSubmit={predictFitScore}>
+        <label style={{ display: "block", fontSize: "0.95rem", marginBottom: "4px", color: "#374151" }}>
+          Experience score (0 to 1): how much prior relevant experience the candidate has.
+        </label>
         <input
           type="number"
           name="experience"
@@ -199,9 +218,13 @@ function InterviewForm() {
           step="0.1"
           value={fitForm.experience}
           onChange={handleFitChange}
-          placeholder="Experience (0 to 1)"
+          placeholder="0.0 to 1.0"
           required
         />
+
+        <label style={{ display: "block", fontSize: "0.95rem", marginTop: "10px", marginBottom: "4px", color: "#374151" }}>
+          Communication score (0 to 1): how clearly the candidate communicates.
+        </label>
         <input
           type="number"
           name="communication"
@@ -210,9 +233,13 @@ function InterviewForm() {
           step="0.1"
           value={fitForm.communication}
           onChange={handleFitChange}
-          placeholder="Communication (0 to 1)"
+          placeholder="0.0 to 1.0"
           required
         />
+
+        <label style={{ display: "block", fontSize: "0.95rem", marginTop: "10px", marginBottom: "4px", color: "#374151" }}>
+          Technical skills score (0 to 1): how strong the candidate is in technical ability.
+        </label>
         <input
           type="number"
           name="technical"
@@ -221,7 +248,7 @@ function InterviewForm() {
           step="0.1"
           value={fitForm.technical}
           onChange={handleFitChange}
-          placeholder="Technical Skills (0 to 1)"
+          placeholder="0.0 to 1.0"
           required
         />
         <button type="submit" className="submit-btn">Predict Fit</button>
@@ -253,10 +280,10 @@ function InterviewForm() {
         <tbody>
           {interviews.map((item) => (
             <tr key={item.id}>
-              <td>{item.candidatename}</td>
+              <td>{item.candidateName}</td>
               <td>{item.email}</td>
               <td>{item.role}</td>
-              <td>{item.interviewdate}</td>
+              <td>{item.interviewDate}</td>
               <td>{item.status}</td>
 
               <td>
