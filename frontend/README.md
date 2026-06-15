@@ -1,70 +1,83 @@
-# Getting Started with Create React App
+# Interview Management Application
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This project is a simple interview scheduling and management app with:
+- a React frontend for the user interface
+- an Express/Node backend for API routes
+- PostgreSQL support via the backend
 
-## Available Scripts
+## Project Structure
 
-In the project directory, you can run:
+- `frontend/` – React app built with Create React App
+- `backend/` – Express API server
 
-### `npm start`
+## Prerequisites
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+Make sure you have the following installed:
+- Node.js (v18 or newer recommended)
+- npm
+- PostgreSQL database and a valid `DATABASE_URL`
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## Setup Instructions
 
-### `npm test`
+### 1. Install backend dependencies
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+```bash
+cd backend
+npm install
+```
 
-### `npm run build`
+### 2. Install frontend dependencies
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+```bash
+cd ../frontend
+npm install
+```
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### 3. Configure the database
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+Create a PostgreSQL database and set the environment variable before starting the backend:
 
-### `npm run eject`
+```bash
+export DATABASE_URL=postgres://username:password@host:port/database
+```
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+On Windows PowerShell, use:
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+```powershell
+$env:DATABASE_URL="postgres://username:password@host:port/database"
+```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+### 4. Run the backend
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+```bash
+cd backend
+npm start
+```
 
-## Learn More
+The API will run on:
+- http://localhost:5000
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+### 5. Run the frontend
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+```bash
+cd frontend
+npm start
+```
 
-### Code Splitting
+The app will open on:
+- http://localhost:3000
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+## Main API Endpoints
 
-### Analyzing the Bundle Size
+- `GET /` – health check
+- `GET /test-db` – test database connection
+- `GET /api/interviews` – fetch interviews
+- `POST /api/interviews` – create an interview
+- `PUT /api/interviews/:id/status` – update interview status
+- `DELETE /api/interviews/:id` – delete an interview
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+## Notes
 
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+- The backend uses CORS and expects JSON requests.
+- The frontend is configured to talk to the backend through the app logic in the React components.
+- If the database connection fails, verify your `DATABASE_URL` value and PostgreSQL server availability.

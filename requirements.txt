@@ -1,0 +1,17 @@
+# Interview Management Application
+# Install Node dependencies for both app parts:
+#   cd backend && npm install
+#   cd frontend && npm install
+
+# Backend packages
+express
+cors
+pg
+nodemailer
+
+# Frontend packages
+react
+react-dom
+axios
+@emailjs/browser
+react-scripts
