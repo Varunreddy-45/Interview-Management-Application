@@ -5,7 +5,7 @@ A simple full-stack interview scheduling and candidate fit evaluation app built 
 ## Features
 - Schedule interviews and store them in the backend
 - View, update, and delete interview records
-- Estimate candidate fit with a lightweight AI-style scoring model
+- Estimate candidate fit with a simple weighted scoring function
 - Send status emails using EmailJS
 
 ## Tech Stack
@@ -51,5 +51,5 @@ DATABASE_URL=your_postgresql_connection_string
 If this is not set, the backend will use an in-memory interview store for local testing.
 
 ## Notes
-- The candidate fit prediction uses a simple weighted score model in `backend/mlModel.js`.
+- The candidate fit prediction uses a simple weighted score function in `backend/mlModel.js`, not a machine learning model.
 - EmailJS is configured in the frontend form for interview notifications.
