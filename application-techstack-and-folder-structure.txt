@@ -1,0 +1,83 @@
+Interview Management Application - Tech Stack and Folder Structure
+
+1. Application Overview
+- Name: Interview Management Application
+- Root package manager: npm
+- Frontend: React (Create React App)
+- Backend: Node.js + Express
+- Database client: pg (PostgreSQL)
+- Email: nodemailer
+- HTTP client: axios
+- Additional services: EmailJS browser SDK
+
+2. Root-level Tech Stack
+- Node.js/npm
+- concurrently (devDependency)
+- Root scripts:
+  - start: runs backend and frontend concurrently
+  - start:backend
+  - start:frontend
+
+3. Backend Tech Stack
+- Node.js
+- express
+- cors
+- dotenv
+- pg
+- nodemailer
+
+4. Frontend Tech Stack
+- react
+- react-dom
+- react-scripts
+- axios
+- @emailjs/browser
+
+5. Folder Structure
+- .git/
+- .gitignore
+- .venv/
+- .vscode/
+- backend/
+  - .env
+  - .npmrc
+  - .nvmrc
+  - backend/
+    - .gitignore
+  - db.js
+  - mlModel.js
+  - package-lock.json
+  - package.json
+  - server.js
+- frontend/
+  - build/
+    - asset-manifest.json
+    - index.html
+    - static/
+      - css/
+        - main.cd9aba16.css
+      - js/
+        - main.48946212.js
+        - main.48946212.js.LICENSE.txt
+    - public/
+      - index.html
+  - src/
+    - App.js
+    - index.js
+    - styles.css
+    - components/
+      - InterviewForm.js
+  - node_modules/
+  - package-lock.json
+  - package.json
+- node_modules/
+- package-lock.json
+- package.json
+- README.md
+- requirements.txt
+- Interview_Management_Application_Report.docx
+
+6. Notes
+- The backend entry point is `backend/server.js`.
+- The frontend is a Create React App project under `frontend/`.
+- The root `package.json` uses `concurrently` to start both backend and frontend together.

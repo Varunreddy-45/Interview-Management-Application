@@ -2,7 +2,9 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import emailjs from "@emailjs/browser";
 
-function InterviewForm() {
+const API_BASE = process.env.REACT_APP_API_URL || "https://interview-management-application.onrender.com/api";
+
+function InterviewForm({ token }) {
   const [formData, setFormData] = useState({
     candidateName: "",
     email: "",
@@ -17,11 +19,11 @@ function InterviewForm() {
     communication: "0.7",
     technical: "0.6"
   });
+  const [scheduleMessage, setScheduleMessage] = useState(null);
 
-  const API_URL =
-    "https://interview-management-application.onrender.com/api/interviews";
-  const MODEL_URL =  "https://interview-management-application.onrender.com/api/predict-fit";
- const EMAILJS_PUBLIC_KEY = "ZumjmtnJzIR1-ugVq";
+  const API_URL = `${API_BASE}/interviews`;
+  const MODEL_URL = `${API_BASE}/predict-fit`;
+  const EMAILJS_PUBLIC_KEY = "ZumjmtnJzIR1-ugVq";
 
 const EMAILJS_SERVICE_ID = "service_iccw53r";
 const EMAILJS_TEMPLATE_ID = "template_n36zluo";
@@ -31,12 +33,16 @@ const STATUS_EMAILJS_TEMPLATE_ID = "template_cwehn62";
 
   useEffect(() => {
     emailjs.init(EMAILJS_PUBLIC_KEY);
-    fetchInterviews();
-  }, []);
+    if (token) {
+      fetchInterviews();
+    }
+  }, [token]);
 
   const fetchInterviews = async () => {
     try {
-      const res = await axios.get(API_URL);
+      const res = await axios.get(API_URL, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
       setInterviews(res.data);
     } catch (error) {
       console.error(error);
@@ -61,7 +67,9 @@ const STATUS_EMAILJS_TEMPLATE_ID = "template_cwehn62";
     e.preventDefault();
 
     try {
-      const res = await axios.post(MODEL_URL, fitForm);
+      const res = await axios.post(MODEL_URL, fitForm, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
       setPrediction(res.data);
     } catch (error) {
       console.error(error);
@@ -73,7 +81,9 @@ const STATUS_EMAILJS_TEMPLATE_ID = "template_cwehn62";
     e.preventDefault();
 
     try {
-      await axios.post(API_URL, formData);
+      await axios.post(API_URL, formData, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
 
      await emailjs.send(
   "service_iccw53r",
@@ -94,7 +104,10 @@ const STATUS_EMAILJS_TEMPLATE_ID = "template_cwehn62";
      "ZumjmtnJzIR1-ugVq"
       );
 
-      alert("Interview Scheduled Successfully");
+      setScheduleMessage("Interview is scheduled");
+      setTimeout(() => {
+        setScheduleMessage(null);
+      }, 5000);
 
       setFormData({
         candidateName: "",
@@ -112,9 +125,11 @@ const STATUS_EMAILJS_TEMPLATE_ID = "template_cwehn62";
 
   const updateStatus = async (id, status, candidate) => {
     try {
-      await axios.put(`${API_URL}/${id}/status`, {
-        status
-      });
+      await axios.put(
+        `${API_URL}/${id}/status`,
+        { status },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
 
       if (["Selected", "Rejected", "Completed"].includes(status)) {
         await emailjs.send(
@@ -148,7 +163,9 @@ const STATUS_EMAILJS_TEMPLATE_ID = "template_cwehn62";
 
   const deleteInterview = async (id) => {
     try {
-      await axios.delete(`${API_URL}/${id}`);
+      await axios.delete(`${API_URL}/${id}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
       fetchInterviews();
     } catch (error) {
       console.error(error);
@@ -159,6 +176,12 @@ const STATUS_EMAILJS_TEMPLATE_ID = "template_cwehn62";
   return (
   <div className="container">
     <h1 className="title">Interview Management System</h1>
+
+    {scheduleMessage && (
+      <div className="auth-message success" style={{ textAlign: "center", marginBottom: "20px" }}>
+        {scheduleMessage}
+      </div>
+    )}
 
     <div className="form-card">
       <form onSubmit={handleSubmit}>
