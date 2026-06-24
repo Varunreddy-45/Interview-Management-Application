@@ -86,8 +86,8 @@ function InterviewForm({ token }) {
       });
 
       await emailjs.send(
-        "service_iccw53r",
-        "template_n36zluo",
+        EMAILJS_SERVICE_ID,
+        EMAILJS_TEMPLATE_ID,
         {
           candidate_name: formData.candidateName,
           name: formData.candidateName,
@@ -132,8 +132,8 @@ function InterviewForm({ token }) {
 
       if (["Selected", "Rejected", "Completed"].includes(status)) {
         await emailjs.send(
-          "service_gbuyvhq",
-          "template_cwehn62",
+          STATUS_EMAILJS_SERVICE_ID,
+          STATUS_EMAILJS_TEMPLATE_ID,
           {
             candidate_name: candidate.candidateName,
             name: candidate.candidateName,
